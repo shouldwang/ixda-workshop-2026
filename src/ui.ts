@@ -9,30 +9,44 @@ import { renderQrCode } from './realtime/qr';
 // 手機掃碼點餐先關掉（辦公室網路的用戶隔離擋住了，之後要開再改回 true）。
 const ENABLE_REMOTE_ORDERING = false;
 
-function optionsHtml(values: readonly string[]) {
-  return values.map((v) => `<option value="${v}">${v}</option>`).join('');
+// 單選 chip 群組（品項/糖度/冰），底層還是原生 radio，只是視覺上做成文字按鈕、選中會 highlight。
+function chipRadioGroupHtml(name: string, values: readonly string[]) {
+  return values
+    .map((v, i) => {
+      const id = `${name}-${v}`;
+      return `<input type="radio" class="chip-input" id="${id}" name="${name}" value="${v}" ${i === 0 ? 'checked' : ''} required><label class="chip" for="${id}">${v}</label>`;
+    })
+    .join('');
+}
+
+// 複選 chip 群組（加料），底層是 checkbox，一樣是文字按鈕樣式。
+function chipCheckboxGroupHtml(name: string, values: readonly string[]) {
+  return values
+    .map((v) => {
+      const id = `${name}-${v}`;
+      return `<input type="checkbox" class="chip-input" id="${id}" name="${name}" value="${v}"><label class="chip" for="${id}">${v}</label>`;
+    })
+    .join('');
 }
 
 function orderFormHtml() {
   return `
     <form id="order-form" class="order-form">
-      <label>
-        品項
-        <select name="item" required>${optionsHtml(DRINK_ITEMS)}</select>
-      </label>
-      <label>
-        糖度
-        <select name="sugar" required>${optionsHtml(SUGAR_LEVELS)}</select>
-      </label>
-      <label>
-        冰/溫度
-        <select name="ice" required>${optionsHtml(ICE_LEVELS)}</select>
-      </label>
-      <fieldset class="toppings">
+      <fieldset class="chip-field">
+        <legend>品項</legend>
+        <div class="chip-group">${chipRadioGroupHtml('item', DRINK_ITEMS)}</div>
+      </fieldset>
+      <fieldset class="chip-field">
+        <legend>糖度</legend>
+        <div class="chip-group">${chipRadioGroupHtml('sugar', SUGAR_LEVELS)}</div>
+      </fieldset>
+      <fieldset class="chip-field">
+        <legend>冰/溫度</legend>
+        <div class="chip-group">${chipRadioGroupHtml('ice', ICE_LEVELS)}</div>
+      </fieldset>
+      <fieldset class="chip-field">
         <legend>加料</legend>
-        ${TOPPINGS.map(
-          (t) => `<label class="checkbox"><input type="checkbox" name="topping" value="${t}"> ${t}</label>`,
-        ).join('')}
+        <div class="chip-group">${chipCheckboxGroupHtml('topping', TOPPINGS)}</div>
       </fieldset>
       <button type="submit">加入點單</button>
     </form>
