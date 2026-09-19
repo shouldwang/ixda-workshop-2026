@@ -6,6 +6,9 @@ import { Scene } from './visual/scene';
 import { RealtimeLink } from './realtime/ws-client';
 import { renderQrCode } from './realtime/qr';
 
+// 手機掃碼點餐先關掉（辦公室網路的用戶隔離擋住了，之後要開再改回 true）。
+const ENABLE_REMOTE_ORDERING = false;
+
 function optionsHtml(values: readonly string[]) {
   return values.map((v) => `<option value="${v}">${v}</option>`).join('');
 }
@@ -51,7 +54,7 @@ function readOrderFromForm(form: HTMLFormElement): Order {
 
 export function renderApp(root: HTMLElement) {
   const mode = new URLSearchParams(location.search).get('mode');
-  if (mode === 'order') {
+  if (ENABLE_REMOTE_ORDERING && mode === 'order') {
     renderOrderApp(root);
   } else {
     renderDisplayApp(root);
@@ -74,10 +77,7 @@ function renderDisplayApp(root: HTMLElement) {
 
           ${orderFormHtml()}
 
-          <section class="qr-panel">
-            <canvas id="qr-canvas" width="160" height="160"></canvas>
-            <p class="qr-hint">用手機掃描直接點餐</p>
-          </section>
+          ${ENABLE_REMOTE_ORDERING ? '<section class="qr-panel"><canvas id="qr-canvas" width="160" height="160"></canvas><p class="qr-hint">用手機掃描直接點餐</p></section>' : ''}
         </div>
 
         <div class="right">
@@ -90,9 +90,11 @@ function renderDisplayApp(root: HTMLElement) {
   const demoBtn = root.querySelector<HTMLButtonElement>('#demo-btn')!;
   const form = root.querySelector<HTMLFormElement>('#order-form')!;
   const canvas = root.querySelector<HTMLCanvasElement>('#drink-canvas')!;
-  const qrCanvas = root.querySelector<HTMLCanvasElement>('#qr-canvas')!;
 
-  renderQrCode(qrCanvas, orderUrl);
+  if (ENABLE_REMOTE_ORDERING) {
+    const qrCanvas = root.querySelector<HTMLCanvasElement>('#qr-canvas')!;
+    renderQrCode(qrCanvas, orderUrl);
+  }
 
   const scene = new Scene(canvas);
   scene.init();
@@ -106,8 +108,10 @@ function renderDisplayApp(root: HTMLElement) {
     scene.addOrder(order);
   }
 
-  const realtime = new RealtimeLink();
-  realtime.connect((order) => submitOrder(order));
+  if (ENABLE_REMOTE_ORDERING) {
+    const realtime = new RealtimeLink();
+    realtime.connect((order) => submitOrder(order));
+  }
 
   demoBtn.addEventListener('click', () => {
     buildDemoOrders().forEach(submitOrder);
