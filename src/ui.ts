@@ -1,6 +1,7 @@
 import { DRINK_ITEMS, ICE_LEVELS, SUGAR_LEVELS, TOPPINGS } from './types';
 import type { Order } from './types';
 import { enqueueOrder, getCurrentOrderId, getQueue, initPlayer, setOnChange, stopPlayer } from './music/player';
+import { buildDemoOrders } from './demo-orders';
 
 function optionsHtml(values: readonly string[]) {
   return values.map((v) => `<option value="${v}">${v}</option>`).join('');
@@ -8,7 +9,7 @@ function optionsHtml(values: readonly string[]) {
 
 function orderLabel(order: Order) {
   const toppingText = order.toppings.length > 0 ? order.toppings.join('、') : '無加料';
-  return `${order.item}・${order.sugar}・${order.ice}・${toppingText}・${order.cycles === 1 ? '8拍' : '16拍'}`;
+  return `${order.item}・${order.sugar}・${order.ice}・${toppingText}`;
 }
 
 export function renderApp(root: HTMLElement) {
@@ -20,6 +21,7 @@ export function renderApp(root: HTMLElement) {
       <section class="engine">
         <button id="engine-btn" type="button">啟動音樂引擎</button>
         <button id="stop-btn" type="button" disabled>停止播放</button>
+        <button id="demo-btn" type="button" disabled>灌入 10 筆範例訂單</button>
         <span id="engine-status" class="status">尚未啟動（需要先點一下才能播聲音）</span>
       </section>
 
@@ -42,13 +44,6 @@ export function renderApp(root: HTMLElement) {
             (t) => `<label class="checkbox"><input type="checkbox" name="topping" value="${t}"> ${t}</label>`,
           ).join('')}
         </fieldset>
-        <label>
-          長度
-          <select name="cycles">
-            <option value="1">一個 8 拍</option>
-            <option value="2">兩個 8 拍</option>
-          </select>
-        </label>
         <button type="submit">加入播放佇列</button>
       </form>
 
@@ -61,6 +56,7 @@ export function renderApp(root: HTMLElement) {
 
   const engineBtn = root.querySelector<HTMLButtonElement>('#engine-btn')!;
   const stopBtn = root.querySelector<HTMLButtonElement>('#stop-btn')!;
+  const demoBtn = root.querySelector<HTMLButtonElement>('#demo-btn')!;
   const engineStatus = root.querySelector<HTMLSpanElement>('#engine-status')!;
   const form = root.querySelector<HTMLFormElement>('#order-form')!;
   const queueList = root.querySelector<HTMLOListElement>('#queue-list')!;
@@ -86,10 +82,15 @@ export function renderApp(root: HTMLElement) {
     await initPlayer();
     engineStatus.textContent = '音樂引擎已啟動';
     stopBtn.disabled = false;
+    demoBtn.disabled = false;
   });
 
   stopBtn.addEventListener('click', () => {
     stopPlayer();
+  });
+
+  demoBtn.addEventListener('click', () => {
+    buildDemoOrders().forEach(enqueueOrder);
   });
 
   form.addEventListener('submit', (e) => {
@@ -102,7 +103,6 @@ export function renderApp(root: HTMLElement) {
       sugar: data.get('sugar') as Order['sugar'],
       ice: data.get('ice') as Order['ice'],
       toppings,
-      cycles: (Number(data.get('cycles')) === 2 ? 2 : 1) as Order['cycles'],
       createdAt: Date.now(),
     };
     enqueueOrder(order);

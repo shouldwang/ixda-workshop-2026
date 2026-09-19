@@ -27,9 +27,11 @@ function buildMelody(order: Order) {
     .sustain(synth.sustain)
     .release(synth.release)
     .lpf(Math.min(synth.lpfBase, ice.lpf))
-    .room(Math.max(synth.roomBase, ice.room));
+    .room(Math.max(synth.roomBase, ice.room))
+    .pan(synth.pan);
 
   if (synth.hpf) pattern = pattern.hpf(synth.hpf);
+  if (synth.vib) pattern = pattern.vib(synth.vib);
   if (synth.delay) pattern = pattern.delay(synth.delay.amount).delaytime(synth.delay.time);
 
   return pattern;

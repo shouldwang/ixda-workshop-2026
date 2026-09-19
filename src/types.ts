@@ -28,6 +28,5 @@ export interface Order {
   sugar: SugarLevel;
   ice: IceLevel;
   toppings: Topping[];
-  cycles: 1 | 2;
   createdAt: number;
 }

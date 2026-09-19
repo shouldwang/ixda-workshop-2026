@@ -9,30 +9,35 @@ export const REGISTER_NOTES: Record<Register, string[]> = {
   high: ['c5', 'eb5', 'f5', 'g5', 'bb5'],
 };
 
-type Waveform = 'sine' | 'triangle' | 'sawtooth' | 'square';
-
+// GM soundfont 音色本來想用（gm_kalimba、gm_pad_warm 這類），但 @strudel/soundfonts 是獨立套件，
+// 用的是另一份 @strudel/core 實例，跟 @strudel/web 自包含 bundle 內部那份不相通（"loaded more than
+// once" 警告就是證據），註冊了也播不出來。要用 GM 音色得整個換成 @strudel/core + @strudel/webaudio
+// 的組合方式重寫播放引擎，先記一筆，這版退回驗證過真的會發聲的內建波形合成器。
 interface FamilySynth {
-  waveform: Waveform;
+  waveform: 'sine' | 'triangle' | 'sawtooth' | 'square';
   attack: number;
   decay: number;
   sustain: number;
   release: number;
   lpfBase: number;
   roomBase: number;
+  pan: number;
   hpf?: number;
+  vib?: number;
   delay?: { time: number; amount: number };
 }
 
 type FamilyKey = 'tea' | 'milkTea' | 'fruitTea' | 'bouncy' | 'cocoa' | 'coffee' | 'matcha';
 
-// 七種風味家族的音色設計：同家族共用音色性格，用音域(register)區分紅茶/綠茶這類對照組。
+// 七種風味家族的音色設計：同家族共用音色性格，用音域(register)區分紅茶/綠茶這類對照組，
+// 額外用 pan 把七個家族在左右聲場上錯開，疊在一起時比較不會糊成一團。
 export const FAMILY_SYNTH: Record<FamilyKey, FamilySynth> = {
-  tea: { waveform: 'triangle', attack: 0.001, decay: 0.08, sustain: 0, release: 0.05, lpfBase: 3500, roomBase: 0.1 },
-  milkTea: { waveform: 'sawtooth', attack: 0.05, decay: 0.3, sustain: 0.4, release: 0.4, lpfBase: 1800, roomBase: 0.2 },
-  fruitTea: { waveform: 'sine', attack: 0.001, decay: 0.15, sustain: 0.1, release: 0.3, lpfBase: 6000, roomBase: 0.35 },
-  bouncy: { waveform: 'square', attack: 0.001, decay: 0.05, sustain: 0, release: 0.02, lpfBase: 4500, roomBase: 0.1 },
-  cocoa: { waveform: 'sawtooth', attack: 0.1, decay: 0.4, sustain: 0.5, release: 0.6, lpfBase: 1000, roomBase: 0.25 },
-  coffee: { waveform: 'square', attack: 0.001, decay: 0.05, sustain: 0.2, release: 0.1, lpfBase: 3000, roomBase: 0.15 },
+  tea: { waveform: 'triangle', attack: 0.001, decay: 0.08, sustain: 0, release: 0.05, lpfBase: 3500, roomBase: 0.1, pan: 0.3 },
+  milkTea: { waveform: 'sawtooth', attack: 0.05, decay: 0.3, sustain: 0.4, release: 0.4, lpfBase: 1800, roomBase: 0.2, pan: 0.7 },
+  fruitTea: { waveform: 'sine', attack: 0.001, decay: 0.15, sustain: 0.1, release: 0.3, lpfBase: 6000, roomBase: 0.35, pan: 0.15 },
+  bouncy: { waveform: 'square', attack: 0.001, decay: 0.05, sustain: 0, release: 0.02, lpfBase: 4500, roomBase: 0.1, pan: 0.85, vib: 6 },
+  cocoa: { waveform: 'sawtooth', attack: 0.1, decay: 0.4, sustain: 0.5, release: 0.6, lpfBase: 1000, roomBase: 0.25, pan: 0.5 },
+  coffee: { waveform: 'square', attack: 0.001, decay: 0.05, sustain: 0.2, release: 0.1, lpfBase: 3000, roomBase: 0.15, pan: 0.4 },
   matcha: {
     waveform: 'triangle',
     attack: 0.005,
@@ -41,6 +46,7 @@ export const FAMILY_SYNTH: Record<FamilyKey, FamilySynth> = {
     release: 0.25,
     lpfBase: 2800,
     roomBase: 0.2,
+    pan: 0.6,
     hpf: 300,
     delay: { time: 0.125, amount: 0.25 },
   },
