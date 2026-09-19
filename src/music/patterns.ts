@@ -28,11 +28,14 @@ function buildMelody(order: Order) {
     .release(synth.release)
     .lpf(Math.min(synth.lpfBase, ice.lpf))
     .room(Math.max(synth.roomBase, ice.room))
-    .pan(synth.pan);
+    .pan(synth.pan)
+    .gain(synth.gain);
 
   if (synth.hpf) pattern = pattern.hpf(synth.hpf);
   if (synth.vib) pattern = pattern.vib(synth.vib);
   if (synth.delay) pattern = pattern.delay(synth.delay.amount).delaytime(synth.delay.time);
+  if (synth.ply) pattern = pattern.ply(synth.ply);
+  if (synth.press) pattern = pattern.press();
 
   return pattern;
 }
@@ -51,7 +54,11 @@ function buildPercussion(order: Order) {
 }
 
 export function buildOrderPattern(order: Order) {
+  const config = DRINK_ITEM_CONFIG[order.item];
+  const synth = FAMILY_SYNTH[config.family];
   const melody = buildMelody(order);
   const percussion = buildPercussion(order);
-  return percussion ? stack(melody, percussion) : melody;
+  const combined = percussion ? stack(melody, percussion) : melody;
+  // 家族的 speed 套在整組（旋律+加料）上，兩層一起變快變慢，才不會在同一杯裡各走各的拍。
+  return combined.fast(synth.speed);
 }

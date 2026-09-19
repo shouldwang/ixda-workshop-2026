@@ -1,4 +1,4 @@
-import { cat, hush, initStrudel } from '@strudel/web';
+import { cat, getAudioContext, initStrudel } from '@strudel/web';
 import type { Order } from '../types';
 import { buildOrderPattern } from './patterns';
 
@@ -12,6 +12,15 @@ export async function initPlayer() {
   if (repl) return repl;
   repl = await initStrudel();
   repl.setCps(CPS);
+  // 瀏覽器的自動播放政策會讓 AudioContext 生在 suspended 狀態，
+  // 一定要等使用者第一次互動才能真正出聲——這裡補一個一次性監聽自動 resume，
+  // 不用另外做「啟動引擎」按鈕。
+  const resume = () => {
+    const ctx = getAudioContext();
+    if (ctx && ctx.state !== 'running') ctx.resume();
+  };
+  window.addEventListener('pointerdown', resume, { once: true });
+  window.addEventListener('keydown', resume, { once: true });
   return repl;
 }
 
@@ -27,8 +36,4 @@ function rebuildAndPlay() {
 export function enqueueOrder(order: Order) {
   queue.push(order);
   rebuildAndPlay();
-}
-
-export function stopPlayer() {
-  hush();
 }

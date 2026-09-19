@@ -1,6 +1,6 @@
 import { DRINK_ITEMS, ICE_LEVELS, SUGAR_LEVELS, TOPPINGS } from './types';
 import type { Order } from './types';
-import { enqueueOrder, initPlayer, stopPlayer } from './music/player';
+import { enqueueOrder, initPlayer } from './music/player';
 import { buildDemoOrders } from './demo-orders';
 import { Scene } from './visual/scene';
 
@@ -16,10 +16,7 @@ export function renderApp(root: HTMLElement) {
       <div class="layout">
         <div class="left">
           <section class="engine">
-            <button id="engine-btn" type="button">啟動音樂引擎</button>
-            <button id="stop-btn" type="button" disabled>停止播放</button>
-            <button id="demo-btn" type="button" disabled>快速加入訂單</button>
-            <span id="engine-status" class="status">尚未啟動（需要先點一下才能播聲音）</span>
+            <button id="demo-btn" type="button">快速加入訂單</button>
           </section>
 
           <form id="order-form" class="order-form">
@@ -52,33 +49,21 @@ export function renderApp(root: HTMLElement) {
     </div>
   `;
 
-  const engineBtn = root.querySelector<HTMLButtonElement>('#engine-btn')!;
-  const stopBtn = root.querySelector<HTMLButtonElement>('#stop-btn')!;
   const demoBtn = root.querySelector<HTMLButtonElement>('#demo-btn')!;
-  const engineStatus = root.querySelector<HTMLSpanElement>('#engine-status')!;
   const form = root.querySelector<HTMLFormElement>('#order-form')!;
   const canvas = root.querySelector<HTMLCanvasElement>('#drink-canvas')!;
 
   const scene = new Scene(canvas);
   scene.init();
+  // 引擎預設就啟動，不需要另外按按鈕；瀏覽器仍會要求第一次使用者互動才能真正出聲，
+  // 這個限制在 initPlayer 內部處理（第一次點擊/按鍵時自動 resume AudioContext）。
+  initPlayer();
 
-  function submitOrder(order: Order) {
+  async function submitOrder(order: Order) {
+    await initPlayer();
     enqueueOrder(order);
     scene.addOrder(order);
   }
-
-  engineBtn.addEventListener('click', async () => {
-    engineBtn.disabled = true;
-    engineStatus.textContent = '啟動中…';
-    await initPlayer();
-    engineStatus.textContent = '音樂引擎已啟動';
-    stopBtn.disabled = false;
-    demoBtn.disabled = false;
-  });
-
-  stopBtn.addEventListener('click', () => {
-    stopPlayer();
-  });
 
   demoBtn.addEventListener('click', () => {
     buildDemoOrders().forEach(submitOrder);

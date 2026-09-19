@@ -22,9 +22,15 @@ interface FamilySynth {
   lpfBase: number;
   roomBase: number;
   pan: number;
+  gain: number;
+  // 用 .fast()/.slow() 讓每個家族在同一個固定 1 cycle 時長裡感覺「BPM 不一樣」——
+  // 實際 cycle 長度沒變（cat() 排隊還是準時切），只是家族自己的素材在那 2 秒裡被壓縮或拉長。
+  speed: number;
   hpf?: number;
   vib?: number;
   delay?: { time: number; amount: number };
+  ply?: number; // 每個音重複幾次（碎拍感）
+  press?: boolean; // 音符往後推一點點，製造搶拍/拖拍的律動差異
 }
 
 type FamilyKey = 'tea' | 'milkTea' | 'fruitTea' | 'bouncy' | 'cocoa' | 'coffee' | 'matcha';
@@ -32,12 +38,12 @@ type FamilyKey = 'tea' | 'milkTea' | 'fruitTea' | 'bouncy' | 'cocoa' | 'coffee' 
 // 七種風味家族的音色設計：同家族共用音色性格，用音域(register)區分紅茶/綠茶這類對照組，
 // 額外用 pan 把七個家族在左右聲場上錯開，疊在一起時比較不會糊成一團。
 export const FAMILY_SYNTH: Record<FamilyKey, FamilySynth> = {
-  tea: { waveform: 'triangle', attack: 0.001, decay: 0.08, sustain: 0, release: 0.05, lpfBase: 3500, roomBase: 0.1, pan: 0.3 },
-  milkTea: { waveform: 'sawtooth', attack: 0.05, decay: 0.3, sustain: 0.4, release: 0.4, lpfBase: 1800, roomBase: 0.2, pan: 0.7 },
-  fruitTea: { waveform: 'sine', attack: 0.001, decay: 0.15, sustain: 0.1, release: 0.3, lpfBase: 6000, roomBase: 0.35, pan: 0.15 },
-  bouncy: { waveform: 'square', attack: 0.001, decay: 0.05, sustain: 0, release: 0.02, lpfBase: 4500, roomBase: 0.1, pan: 0.85, vib: 6 },
-  cocoa: { waveform: 'sawtooth', attack: 0.1, decay: 0.4, sustain: 0.5, release: 0.6, lpfBase: 1000, roomBase: 0.25, pan: 0.5 },
-  coffee: { waveform: 'square', attack: 0.001, decay: 0.05, sustain: 0.2, release: 0.1, lpfBase: 3000, roomBase: 0.15, pan: 0.4 },
+  tea: { waveform: 'triangle', attack: 0.001, decay: 0.08, sustain: 0, release: 0.05, lpfBase: 3500, roomBase: 0.1, pan: 0.3, gain: 0.85, speed: 1 },
+  milkTea: { waveform: 'sawtooth', attack: 0.05, decay: 0.3, sustain: 0.4, release: 0.4, lpfBase: 1800, roomBase: 0.2, pan: 0.7, gain: 0.9, speed: 0.6 },
+  fruitTea: { waveform: 'sine', attack: 0.001, decay: 0.15, sustain: 0.1, release: 0.3, lpfBase: 6000, roomBase: 0.35, pan: 0.15, gain: 0.8, speed: 1.4 },
+  bouncy: { waveform: 'square', attack: 0.001, decay: 0.05, sustain: 0, release: 0.02, lpfBase: 4500, roomBase: 0.1, pan: 0.85, gain: 0.85, speed: 1.8, vib: 6, ply: 2 },
+  cocoa: { waveform: 'sawtooth', attack: 0.1, decay: 0.4, sustain: 0.5, release: 0.6, lpfBase: 1000, roomBase: 0.25, pan: 0.5, gain: 0.95, speed: 0.55 },
+  coffee: { waveform: 'square', attack: 0.001, decay: 0.05, sustain: 0.2, release: 0.1, lpfBase: 3000, roomBase: 0.15, pan: 0.4, gain: 0.85, speed: 1.6, press: true },
   matcha: {
     waveform: 'triangle',
     attack: 0.005,
@@ -47,6 +53,8 @@ export const FAMILY_SYNTH: Record<FamilyKey, FamilySynth> = {
     lpfBase: 2800,
     roomBase: 0.2,
     pan: 0.6,
+    gain: 0.8,
+    speed: 0.8,
     hpf: 300,
     delay: { time: 0.125, amount: 0.25 },
   },
