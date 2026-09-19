@@ -1,9 +1,9 @@
 :root {
   color-scheme: light dark;
   font-family: system-ui, -apple-system, 'PingFang TC', 'Noto Sans TC', sans-serif;
-  --accent: #ff5d73;
-  --accent-2: #7c3aed;
-  --accent-3: #06b6d4;
+  --accent: #ef6c3e;
+  --accent-2: #c8481f;
+  --accent-3: #d99a2b;
   --bg: #fff7f2;
   --panel: #ffffff;
   --border: #ffd9c7;

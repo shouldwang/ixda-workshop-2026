@@ -18,7 +18,7 @@ export function renderApp(root: HTMLElement) {
           <section class="engine">
             <button id="engine-btn" type="button">啟動音樂引擎</button>
             <button id="stop-btn" type="button" disabled>停止播放</button>
-            <button id="demo-btn" type="button" disabled>灌入 10 筆範例訂單</button>
+            <button id="demo-btn" type="button" disabled>快速加入訂單</button>
             <span id="engine-status" class="status">尚未啟動（需要先點一下才能播聲音）</span>
           </section>
 

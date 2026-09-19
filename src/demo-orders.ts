@@ -1,23 +1,23 @@
-import type { Order } from './types';
+import { DRINK_ITEMS, ICE_LEVELS, SUGAR_LEVELS, TOPPINGS } from './types';
+import type { Order, Topping } from './types';
 
-// 隨手挑的 10 杯組合，用來一次灌進佇列測聽整個系統，涵蓋大部分品項/糖冰/加料的變化範圍。
-const COMBOS: Array<Omit<Order, 'id' | 'createdAt'>> = [
-  { item: '紅茶', sugar: '全糖', ice: '全冰', toppings: ['珍珠'] },
-  { item: '奶茶', sugar: '半糖', ice: '少冰', toppings: ['珍珠', '椰果'] },
-  { item: '水果綠茶', sugar: '微糖', ice: '去冰', toppings: ['椰果'] },
-  { item: '多多紅茶', sugar: '少糖', ice: '微冰', toppings: [] },
-  { item: '可可', sugar: '全糖', ice: '熱', toppings: ['粉粿'] },
-  { item: '咖啡', sugar: '無糖', ice: '溫', toppings: [] },
-  { item: '抹茶', sugar: '半糖', ice: '少冰', toppings: ['粉粿'] },
-  { item: '綠茶', sugar: '無糖', ice: '去冰', toppings: [] },
-  { item: '奶綠', sugar: '全糖', ice: '全冰', toppings: ['珍珠', '粉粿'] },
-  { item: '水果紅茶', sugar: '少糖', ice: '微冰', toppings: ['椰果', '粉粿'] },
-];
+function pickOne<T>(arr: readonly T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 
+function pickRandomToppings(): Topping[] {
+  return TOPPINGS.filter(() => Math.random() < 0.35);
+}
+
+// 隨機灌 5~10 筆訂單，方便一次測聽/測畫面，不用手動填表單。
 export function buildDemoOrders(): Order[] {
-  return COMBOS.map((combo, i) => ({
-    ...combo,
+  const count = 5 + Math.floor(Math.random() * 6);
+  return Array.from({ length: count }, (_, i) => ({
     id: `demo-${Date.now()}-${i}`,
+    item: pickOne(DRINK_ITEMS),
+    sugar: pickOne(SUGAR_LEVELS),
+    ice: pickOne(ICE_LEVELS),
+    toppings: pickRandomToppings(),
     createdAt: Date.now(),
   }));
 }
