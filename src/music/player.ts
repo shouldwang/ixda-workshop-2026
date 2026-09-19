@@ -1,5 +1,6 @@
 import { cat, getAudioContext, initStrudel } from '@strudel/web';
 import type { Order } from '../types';
+import { buildIdlePattern } from './idle';
 import { buildOrderPattern } from './patterns';
 
 // 1 cycle = 2 秒（cps = 0.5），一杯飲料固定佔一個 cycle（8 拍）。
@@ -21,6 +22,8 @@ export async function initPlayer() {
   };
   window.addEventListener('pointerdown', resume, { once: true });
   window.addEventListener('keydown', resume, { once: true });
+  // 佇列還空著的時候先墊一段氛圍底噪，第一筆訂單進來會被 rebuildAndPlay 的 .play() 自然換掉。
+  buildIdlePattern().play();
   return repl;
 }
 
