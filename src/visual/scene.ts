@@ -3,6 +3,8 @@ import { getCupSprite, getToppingSprite, preloadAssets } from './assets';
 
 const CHAR_HEIGHT = 110;
 const WANDER_SPEED = 22; // px/秒
+const COMMENT_BAND_TOP = 20;
+const COMMENT_LANE_HEIGHT = 26;
 
 interface Character {
   order: Order;
@@ -31,6 +33,7 @@ export class Scene {
   private comments: BulletComment[] = [];
   private lastTime = 0;
   private ready = false;
+  private nextLane = 0;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -76,10 +79,14 @@ export class Scene {
     this.characters.push(char);
 
     const toppingText = order.toppings.length > 0 ? `・${order.toppings.join('')}` : '';
+    // 用車道輪流分配 + 起始位置錯開，避免同時灌入多筆訂單時彈幕疊在同一行、同一個 x 上。
+    const laneCount = Math.max(1, Math.floor((this.height * 0.3 - COMMENT_BAND_TOP) / COMMENT_LANE_HEIGHT));
+    const lane = this.nextLane % laneCount;
+    this.nextLane++;
     this.comments.push({
       text: `${order.item}・${order.sugar}・${order.ice}${toppingText} 已加入`,
-      x: this.width,
-      y: 20 + Math.random() * Math.max(this.height * 0.3 - 20, 0),
+      x: this.width + Math.random() * 160,
+      y: COMMENT_BAND_TOP + lane * COMMENT_LANE_HEIGHT + COMMENT_LANE_HEIGHT / 2,
       vx: -90 - Math.random() * 40,
     });
   }
