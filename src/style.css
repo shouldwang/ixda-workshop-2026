@@ -1,42 +1,75 @@
 :root {
   color-scheme: light dark;
   font-family: system-ui, -apple-system, 'PingFang TC', 'Noto Sans TC', sans-serif;
+  --accent: #ff5d73;
+  --accent-2: #7c3aed;
+  --accent-3: #06b6d4;
+  --bg: #fff7f2;
+  --panel: #ffffff;
+  --border: #ffd9c7;
+}
+
+html, body {
+  height: 100%;
 }
 
 body {
   margin: 0;
-  padding: 2rem 1rem;
-  display: flex;
-  justify-content: center;
+  background: var(--bg);
 }
 
 .app {
+  min-height: 100vh;
   width: 100%;
-  max-width: 640px;
+  box-sizing: border-box;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 h1 {
-  margin-bottom: 0.25rem;
+  margin: 0 0 1rem;
+  color: var(--accent-2);
+  font-size: 1.6rem;
 }
 
-.hint {
-  color: #666;
-  margin-top: 0;
+.layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+}
+
+.left {
+  flex: 0 0 320px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.right {
+  flex: 1;
+  min-width: 320px;
+  display: flex;
 }
 
 .engine {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
 }
 
 .status {
-  color: #666;
+  color: var(--accent-3);
   font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .order-form {
@@ -44,9 +77,9 @@ h1 {
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
 }
 
 .order-form label {
@@ -54,10 +87,14 @@ h1 {
   flex-direction: column;
   gap: 0.25rem;
   font-size: 0.9rem;
+  color: var(--accent-2);
+  font-weight: 600;
 }
 
 .order-form select {
   padding: 0.4rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
 }
 
 .toppings {
@@ -71,12 +108,16 @@ h1 {
 
 .toppings legend {
   font-size: 0.9rem;
+  color: var(--accent-2);
+  font-weight: 600;
   padding: 0;
 }
 
 .checkbox {
   flex-direction: row !important;
   align-items: center;
+  color: #333 !important;
+  font-weight: 400 !important;
 }
 
 .order-form button {
@@ -85,34 +126,32 @@ h1 {
 
 button {
   padding: 0.5rem 1rem;
-  border-radius: 6px;
-  border: 1px solid #333;
-  background: #111;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
   color: #fff;
+  font-weight: 700;
   cursor: pointer;
 }
 
+button#stop-btn {
+  background: var(--accent-2);
+}
+
+button#demo-btn {
+  background: var(--accent-3);
+}
+
 button:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
-.queue ol {
-  list-style: decimal;
-  padding-left: 1.25rem;
-}
-
-.queue li {
-  padding: 0.35rem 0;
-}
-
-.queue li.playing {
-  font-weight: 700;
-  color: #0a7d3c;
-}
-
-.queue li.empty {
-  list-style: none;
-  padding-left: 0;
-  color: #888;
+#drink-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: linear-gradient(#fffdf9, #ffe9dd);
 }

@@ -1,56 +1,54 @@
 import { DRINK_ITEMS, ICE_LEVELS, SUGAR_LEVELS, TOPPINGS } from './types';
 import type { Order } from './types';
-import { enqueueOrder, getCurrentOrderId, getQueue, initPlayer, setOnChange, stopPlayer } from './music/player';
+import { enqueueOrder, initPlayer, stopPlayer } from './music/player';
 import { buildDemoOrders } from './demo-orders';
+import { Scene } from './visual/scene';
 
 function optionsHtml(values: readonly string[]) {
   return values.map((v) => `<option value="${v}">${v}</option>`).join('');
-}
-
-function orderLabel(order: Order) {
-  const toppingText = order.toppings.length > 0 ? order.toppings.join('、') : '無加料';
-  return `${order.item}・${order.sugar}・${order.ice}・${toppingText}`;
 }
 
 export function renderApp(root: HTMLElement) {
   root.innerHTML = `
     <div class="app">
       <h1>飲料點單音樂機</h1>
-      <p class="hint">每筆訂單會排進播放佇列，一杯接一杯播，播完整輪會從頭再來一次；新訂單隨時可以加進去。</p>
 
-      <section class="engine">
-        <button id="engine-btn" type="button">啟動音樂引擎</button>
-        <button id="stop-btn" type="button" disabled>停止播放</button>
-        <button id="demo-btn" type="button" disabled>灌入 10 筆範例訂單</button>
-        <span id="engine-status" class="status">尚未啟動（需要先點一下才能播聲音）</span>
-      </section>
+      <div class="layout">
+        <div class="left">
+          <section class="engine">
+            <button id="engine-btn" type="button">啟動音樂引擎</button>
+            <button id="stop-btn" type="button" disabled>停止播放</button>
+            <button id="demo-btn" type="button" disabled>灌入 10 筆範例訂單</button>
+            <span id="engine-status" class="status">尚未啟動（需要先點一下才能播聲音）</span>
+          </section>
 
-      <form id="order-form" class="order-form">
-        <label>
-          品項
-          <select name="item" required>${optionsHtml(DRINK_ITEMS)}</select>
-        </label>
-        <label>
-          糖度
-          <select name="sugar" required>${optionsHtml(SUGAR_LEVELS)}</select>
-        </label>
-        <label>
-          冰/溫度
-          <select name="ice" required>${optionsHtml(ICE_LEVELS)}</select>
-        </label>
-        <fieldset class="toppings">
-          <legend>加料</legend>
-          ${TOPPINGS.map(
-            (t) => `<label class="checkbox"><input type="checkbox" name="topping" value="${t}"> ${t}</label>`,
-          ).join('')}
-        </fieldset>
-        <button type="submit">加入播放佇列</button>
-      </form>
+          <form id="order-form" class="order-form">
+            <label>
+              品項
+              <select name="item" required>${optionsHtml(DRINK_ITEMS)}</select>
+            </label>
+            <label>
+              糖度
+              <select name="sugar" required>${optionsHtml(SUGAR_LEVELS)}</select>
+            </label>
+            <label>
+              冰/溫度
+              <select name="ice" required>${optionsHtml(ICE_LEVELS)}</select>
+            </label>
+            <fieldset class="toppings">
+              <legend>加料</legend>
+              ${TOPPINGS.map(
+                (t) => `<label class="checkbox"><input type="checkbox" name="topping" value="${t}"> ${t}</label>`,
+              ).join('')}
+            </fieldset>
+            <button type="submit">加入點單</button>
+          </form>
+        </div>
 
-      <section class="queue">
-        <h2>播放佇列</h2>
-        <ol id="queue-list"></ol>
-      </section>
+        <div class="right">
+          <canvas id="drink-canvas"></canvas>
+        </div>
+      </div>
     </div>
   `;
 
@@ -59,22 +57,15 @@ export function renderApp(root: HTMLElement) {
   const demoBtn = root.querySelector<HTMLButtonElement>('#demo-btn')!;
   const engineStatus = root.querySelector<HTMLSpanElement>('#engine-status')!;
   const form = root.querySelector<HTMLFormElement>('#order-form')!;
-  const queueList = root.querySelector<HTMLOListElement>('#queue-list')!;
+  const canvas = root.querySelector<HTMLCanvasElement>('#drink-canvas')!;
 
-  function renderQueue() {
-    const queue = getQueue();
-    const currentId = getCurrentOrderId();
-    if (queue.length === 0) {
-      queueList.innerHTML = '<li class="empty">佇列是空的，加一筆訂單開始播放</li>';
-      return;
-    }
-    queueList.innerHTML = queue
-      .map((order) => `<li class="${order.id === currentId ? 'playing' : ''}">${orderLabel(order)}</li>`)
-      .join('');
+  const scene = new Scene(canvas);
+  scene.init();
+
+  function submitOrder(order: Order) {
+    enqueueOrder(order);
+    scene.addOrder(order);
   }
-
-  setOnChange(renderQueue);
-  renderQueue();
 
   engineBtn.addEventListener('click', async () => {
     engineBtn.disabled = true;
@@ -90,7 +81,7 @@ export function renderApp(root: HTMLElement) {
   });
 
   demoBtn.addEventListener('click', () => {
-    buildDemoOrders().forEach(enqueueOrder);
+    buildDemoOrders().forEach(submitOrder);
   });
 
   form.addEventListener('submit', (e) => {
@@ -105,7 +96,7 @@ export function renderApp(root: HTMLElement) {
       toppings,
       createdAt: Date.now(),
     };
-    enqueueOrder(order);
+    submitOrder(order);
     form.reset();
   });
 }
