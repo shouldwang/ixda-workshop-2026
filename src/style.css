@@ -1,0 +1,118 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, 'PingFang TC', 'Noto Sans TC', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 2rem 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.app {
+  width: 100%;
+  max-width: 640px;
+}
+
+h1 {
+  margin-bottom: 0.25rem;
+}
+
+.hint {
+  color: #666;
+  margin-top: 0;
+}
+
+.engine {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.status {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.order-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.order-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.order-form select {
+  padding: 0.4rem;
+}
+
+.toppings {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 1rem;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toppings legend {
+  font-size: 0.9rem;
+  padding: 0;
+}
+
+.checkbox {
+  flex-direction: row !important;
+  align-items: center;
+}
+
+.order-form button {
+  grid-column: 1 / -1;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background: #111;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.queue ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+
+.queue li {
+  padding: 0.35rem 0;
+}
+
+.queue li.playing {
+  font-weight: 700;
+  color: #0a7d3c;
+}
+
+.queue li.empty {
+  list-style: none;
+  padding-left: 0;
+  color: #888;
+}
