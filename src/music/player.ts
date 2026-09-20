@@ -1,4 +1,4 @@
-import { cat, doughsamples, getAudioContext, initStrudel } from '@strudel/web';
+import { cat, getAudioContext, initStrudel, samples } from '@strudel/web';
 import type { Order } from '../types';
 import { buildIdlePattern } from './idle';
 import { buildOrderPattern } from './patterns';
@@ -13,8 +13,16 @@ export async function initPlayer() {
   if (repl) return repl;
   repl = await initStrudel({
     // @strudel/web 的 npm bundle 不會自動載入外部 sample map；
-    // 先註冊 Dirt Samples，才能讓加料使用的 bd / hh / rim 正常發聲。
-    prebake: () => doughsamples('github:tidalcycles/dirt-samples'),
+    // 只註冊作品需要的三個 Dirt Samples，避免下載整份 sample map。
+    prebake: () =>
+      samples(
+        {
+          bd: 'bd/BT0AADA.wav',
+          hh: 'hh/000_hh3closedhh.wav',
+          rim: 'voodoo/002_VoodooRim.wav',
+        },
+        'https://raw.githubusercontent.com/tidalcycles/Dirt-Samples/master/',
+      ),
   });
   repl.setCps(CPS);
   // 瀏覽器的自動播放政策會讓 AudioContext 生在 suspended 狀態，
