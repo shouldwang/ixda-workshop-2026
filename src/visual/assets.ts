@@ -2,18 +2,20 @@ import { SUGAR_LEVELS, TOPPINGS } from '../types';
 import type { IceLevel, SugarLevel, Topping } from '../types';
 import { ICE_TINT } from './color';
 
+const DRINK_ASSET_BASE = `${import.meta.env.BASE_URL}drinks/`;
+
 const SUGAR_SRC: Record<SugarLevel, string> = {
-  無糖: '/drinks/sugar-0.png',
-  微糖: '/drinks/sugar-1.png',
-  半糖: '/drinks/sugar-2.png',
-  少糖: '/drinks/sugar-3.png',
-  全糖: '/drinks/sugar-4.png',
+  無糖: `${DRINK_ASSET_BASE}sugar-0.png`,
+  微糖: `${DRINK_ASSET_BASE}sugar-1.png`,
+  半糖: `${DRINK_ASSET_BASE}sugar-2.png`,
+  少糖: `${DRINK_ASSET_BASE}sugar-3.png`,
+  全糖: `${DRINK_ASSET_BASE}sugar-4.png`,
 };
 
 const TOPPING_SRC: Record<Topping, string> = {
-  珍珠: '/drinks/topping-pearls.png',
-  椰果: '/drinks/topping-coconut-jelly.png',
-  粉粿: '/drinks/topping-fen-guo.png',
+  珍珠: `${DRINK_ASSET_BASE}topping-pearls.png`,
+  椰果: `${DRINK_ASSET_BASE}topping-coconut-jelly.png`,
+  粉粿: `${DRINK_ASSET_BASE}topping-fen-guo.png`,
 };
 
 function loadImage(src: string): Promise<HTMLImageElement> {

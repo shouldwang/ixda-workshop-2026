@@ -1,4 +1,4 @@
-import { cat, getAudioContext, initStrudel } from '@strudel/web';
+import { cat, doughsamples, getAudioContext, initStrudel } from '@strudel/web';
 import type { Order } from '../types';
 import { buildIdlePattern } from './idle';
 import { buildOrderPattern } from './patterns';
@@ -11,7 +11,11 @@ let queue: Order[] = [];
 
 export async function initPlayer() {
   if (repl) return repl;
-  repl = await initStrudel();
+  repl = await initStrudel({
+    // @strudel/web 的 npm bundle 不會自動載入外部 sample map；
+    // 先註冊 Dirt Samples，才能讓加料使用的 bd / hh / rim 正常發聲。
+    prebake: () => doughsamples('github:tidalcycles/dirt-samples'),
+  });
   repl.setCps(CPS);
   // 瀏覽器的自動播放政策會讓 AudioContext 生在 suspended 狀態，
   // 一定要等使用者第一次互動才能真正出聲——這裡補一個一次性監聽自動 resume，
