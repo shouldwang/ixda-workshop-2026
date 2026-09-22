@@ -7,7 +7,10 @@
 https://shouldwang.github.io/ixda-workshop-2026/
 
 4.作品截圖（3-5張照片）：
-（待補）
+
+![點單面板](screenshots/01-order-panel.png)
+
+![飲料角色與音樂場景](screenshots/02-drinks-scene.png)
 
 5.其他公開資訊
 共同發想與共同創作：Winnie / Raphy
